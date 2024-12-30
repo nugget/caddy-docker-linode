@@ -40,7 +40,7 @@ debug:
 	@echo 
 
 buildx:
-	@echo "# making: clean"
+	@echo "# making: buildx"
 	@echo making target buildx
 	docker buildx create --name $(builder)
 	docker buildx use $(builder)
@@ -49,7 +49,7 @@ buildx:
 
 clean:
 	@echo "# making: clean"
-	docker buildx rm $(builder)
+	-docker buildx rm $(builder)
 	@echo 
 
 pullbase:
@@ -70,16 +70,14 @@ image: debug pullbase
 	docker inspect $(image):$(devtag) | jq '.[0].Config.Labels' 
 	@echo 
 
-prod: debug pullbase buildx
+push: debug pullbase buildx
 	@echo "# making: prod"
 	docker buildx use $(PROJECT)
 	docker buildx build $(oci-build-labels) -t $(image):$(prodtag) $(FROM_IMAGE_TAGARGS) --platform=$(platforms) --push . 
+	docker buildx rm $(builder)
 	docker pull $(image):$(prodtag)
 	docker inspect $(image):$(prodtag) | jq '.[0].Config.Labels' 
-	make clean
 	@echo 
-
-push: prod clean
 
 run: stop image 
 	@echo "# making: run"
