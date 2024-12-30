@@ -1,60 +1,57 @@
-.PHONY: debug public tag
+PROJECT=caddy-with-linode-dns
+REGISTRY=docker.io
+LIBRARY=nugget
 
-PROJECT=nugget/caddy-dns-linode
-REGISTRY=registry.hollowoak.net
+image=$(REGISTRY)/$(LIBRARY)/$(PROJECT)
+
+platforms=linux/amd64,linux/arm64
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
-
-OCI_IMAGE_URL="https://github.com/"
+OCI_IMAGE_URL="https://hub.docker.com/repository/docker/nugget/caddy-with-linode-dns"
 OCI_IMAGE_AUTHORS="David 'nugget' McNett <contact@nugget.info>"
-OCI_IMAGE_DESCRIPTION="caddy-docker base layer with dns.providers.linode module"
+OCI_IMAGE_DESCRIPTION="caddy-docker base with dns.providers.linode module and fish shell added"
 
 include ./tools/make/oci-annotations-environment.Makefile
 include ./tools/make/oci-annotations-vcs-git.Makefile
-
 include ./tools/make/oci-docker-build-args.Makefile
 
-PRODTAG=latest
-LOCALTAG=local
+prodtag=latest
+devtag=dev
 
-IMAGE=$(REGISTRY)/$(PROJECT)
+.PHONY: debug buildx clean pullcaddy image release run stop
 
-BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-.PHONY: debug
 debug:
 	@echo ""
-	@echo $(IMAGE):$(TAG)
-	@echo $(oci-build-labels)
+	@echo $(image)
 	@echo ""
 
-image: debug
-	docker buildx create --name caddybuilder --use
+buildx:
+	docker buildx create --name $(PROJECT)
+	docker buildx use $(PROJECT)
 	docker buildx install
-	docker buildx build $(oci-build-labels) -t $(IMAGE):$(PRODTAG) --platform=linux/amd64,linux/arm64 --push . 
-	docker buildx rm caddybuilder
-	docker pull $(IMAGE):$(PRODTAG)
-	docker inspect $(IMAGE):$(PRODTAG) | jq '.[0].Config.Labels' 
 
-updatebase:
+clean:
+	docker buildx rm caddybuilder
+
+pullcaddy:
 	docker pull caddy:latest
 	docker pull caddy:builder
 
-buildlocal: debug updatebase
-	docker build $(oci-build-labels) -t $(IMAGE):$(LOCALTAG) .
-	docker inspect $(IMAGE):$(LOCALTAG) | jq '.[0].Config.Labels' 
+image: debug pullcaddy
+	docker build $(oci-build-labels) -t $(image):$(devtag) . 
+	docker inspect $(image):$(devtag) | jq '.[0].Config.Labels' 
 
-runlocal: stoplocal buildlocal public
-	docker run --name nugget-info -d -p 8080:80 $(IMAGE):$(LOCALTAG)
+release: debug pullcaddy buildx
+	docker buildx use $(PROJECT)
+	docker buildx build $(oci-build-labels) -t $(image):$(prodtag) --platform=$(platforms) --push . 
+	docker pull $(image):$(prodtag)
+	docker inspect $(image):$(prodtag) | jq '.[0].Config.Labels' 
+
+run: stop image 
+	docker run --name $(PROJECT) -d -p 8080:80 $(image):$(devtag)
 	open http://localhost:8080/
+	docker logs -f $(PROJECT)
 
-stoplocal:
-	-docker container stop nugget-info
-	-docker container rm nugget-info
-
-public:
-	cd hugo && hugo  --cleanDestinationDir 
-
-deploy: public buildimage
-	docker tag $(IMAGE):$(TAG) $(IMAGE):$(PRODTAG)
-	docker push $(IMAGE):$(PRODTAG)
+stop:
+	-docker container stop $(PROJECT)
+	-docker container rm $(PROJECT)
