@@ -33,7 +33,6 @@ ARG OCI_IMAGE_DESCRIPTION
 ARG OCI_IMAGE_BASE_DIGEST
 ARG OCI_IMAGE_BASE_NAME
 
-LABEL maintainer="${OCI_IMAGE_AUTHORS}"
 LABEL org.opencontainers.image.created="${OCI_IMAGE_CREATED}"
 LABEL org.opencontainers.image.authors="${OCI_IMAGE_AUTHORS}"
 LABEL org.opencontainers.image.url="${OCI_IMAGE_URL}"
