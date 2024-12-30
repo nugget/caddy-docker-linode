@@ -38,10 +38,6 @@ debug:
 	@echo "# created: $(OCI_IMAGE_CREATED)"
 	@echo "#"
 	@echo 
-	@echo "TAGLIST: $(FROM_IMAGE_TAGLIST)"
-	@echo
-	@echo "TAGARGS: $(FROM_IMAGE_TAGARGS)"
-	@echo
 
 buildx:
 	@echo "# making: clean"
@@ -60,8 +56,12 @@ pullbase:
 	@echo "# making: pullbase"
 	@echo making target pullbase
 	docker pull $(FROM_IMAGE)
-	docker inspect $(FROM_IMAGE) | jq '.[0].Config.Labels' 
-	@echo base image tags: $(FROM_IMAGE_TAGLIST)
+	@echo 
+	@echo "$(FROM_IMAGE) Labels:"
+	@docker inspect $(FROM_IMAGE) | jq '.[0].Config.Labels' 
+	@echo
+	@echo "$(FROM_IMAGE) Tags:"
+	@echo "{ $(FROM_IMAGE_TAGLIST) }"
 	@echo 
 
 image: debug pullbase
