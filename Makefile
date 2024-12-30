@@ -29,7 +29,7 @@ prodtag=latest
 devtag=dev
 builder=builder-$(PROJECT)
 
-.PHONY: debug buildx clean pullcaddy image release run stop
+.PHONY: debug buildx clean pullbase image prod push run stop
 
 debug:
 	@echo "#"
@@ -70,13 +70,16 @@ image: debug pullbase
 	docker inspect $(image):$(devtag) | jq '.[0].Config.Labels' 
 	@echo 
 
-release: debug pullbase buildx
-	@echo "# making: release"
+prod: debug pullbase buildx
+	@echo "# making: prod"
 	docker buildx use $(PROJECT)
 	docker buildx build $(oci-build-labels) -t $(image):$(prodtag) $(FROM_IMAGE_TAGARGS) --platform=$(platforms) --push . 
 	docker pull $(image):$(prodtag)
 	docker inspect $(image):$(prodtag) | jq '.[0].Config.Labels' 
+	make clean
 	@echo 
+
+push: prod clean
 
 run: stop image 
 	@echo "# making: run"
