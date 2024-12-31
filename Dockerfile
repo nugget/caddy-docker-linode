@@ -1,25 +1,15 @@
-FROM caddy:builder AS build
+FROM caddy:builder AS builder
 
-RUN xcaddy build latest --output /build/caddy --with github.com/caddy-dns/linode
+RUN xcaddy build \
+	--with github.com/caddy-dns/linode
 
 FROM caddy:latest AS baselayer
 
-FROM scratch
-COPY --from=baselayer . /
 RUN apk add --no-cache fish ca-certificates libcap mailcap
 
-COPY --from=build build/caddy /usr/bin/caddy
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 RUN cp -p /usr/share/caddy/index.html /usr/share/caddy/index-original.html
 COPY webroot/index.html /usr/share/caddy/index.html
-
-EXPOSE 80
-EXPOSE 443
-EXPOSE 443/udp
-EXPOSE 2019
-
-WORKDIR /srv
-
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
 
 ARG OCI_IMAGE_CREATED
 ARG OCI_IMAGE_AUTHORS
