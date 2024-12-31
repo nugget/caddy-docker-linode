@@ -66,6 +66,7 @@ pullbase:
 
 image: debug pullbase
 	@echo "# making: image"
+	docker context use default
 	docker build $(oci-build-labels) -t $(image):$(devtag) . 
 	docker inspect $(image):$(devtag) | jq '.[0].Config.Labels' 
 	@echo 
