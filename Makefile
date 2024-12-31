@@ -19,8 +19,8 @@ OCI_IMAGE_TITLE="Caddy with dns.providers.linode"
 OCI_IMAGE_DESCRIPTION=$(FROM_IMAGE_DESCRIPTION)"\nThis is a custom build with the dns.providers.linode module and fish shell added to the official distribution."
 OCI_IMAGE_DOCUMENTATION=$(OCI_IMAGE_SOURCE)
 OCI_IMAGE_LICENSES=$(FROM_IMAGE_LICENSES)
-OCI_IMAGE_BASE_NAME=$(FROM_IMAGE)
 OCI_IMAGE_REF_NAME=$(image)
+OCI_IMAGE_BASE_NAME=$(FROM_IMAGE_BASE_NAME)
 
 include ./tools/make/oci-annotations-environment.Makefile
 include ./tools/make/oci-annotations-vcs-git.Makefile
