@@ -26,6 +26,9 @@ include ./tools/make/oci-annotations-environment.Makefile
 include ./tools/make/oci-annotations-vcs-git.Makefile
 include ./tools/make/oci-docker-build-args.Makefile
 
+JQ_BIN        ?=$(shell which jq)
+DOCKER_BIN    ?=$(shell which docker)
+GIT_BIN       ?=$(shell which git)
 
 prodtag=latest
 devtag=dev
@@ -39,7 +42,17 @@ debug:
 	@echo "#"
 	@echo "# created: $(OCI_IMAGE_CREATED)"
 	@echo "#"
-	@echo 
+
+dep:
+	@which $(GIT_BIN) >/dev/null || (echo Cannot locate git in path; exit 1)
+	@$(GIT_BIN) version
+
+	@which $(JQ_BIN) >/dev/null || (echo Cannot locate jq in path; exit 1)
+	@$(JQ_BIN) --version
+
+	@which $(DOCKER_BIN) >/dev/null || (echo Cannot locate docker in path; exit 1)
+	@$(DOCKER_BIN) -v
+	@echo
 
 buildx:
 	@echo "# making: buildx"
