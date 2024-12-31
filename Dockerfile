@@ -1,25 +1,15 @@
-FROM caddy:builder AS build
+FROM caddy:builder AS builder
 
-RUN xcaddy build latest --output /build/caddy --with github.com/caddy-dns/linode
+RUN xcaddy build \
+	--with github.com/caddy-dns/linode
 
 FROM caddy:latest AS baselayer
 
-FROM scratch
-COPY --from=baselayer . /
 RUN apk add --no-cache fish ca-certificates libcap mailcap
 
-COPY --from=build build/caddy /usr/bin/caddy
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 RUN cp -p /usr/share/caddy/index.html /usr/share/caddy/index-original.html
 COPY webroot/index.html /usr/share/caddy/index.html
-
-EXPOSE 80
-EXPOSE 443
-EXPOSE 443/udp
-EXPOSE 2019
-
-WORKDIR /srv
-
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
 
 ARG OCI_IMAGE_CREATED
 ARG OCI_IMAGE_AUTHORS
@@ -33,8 +23,11 @@ ARG OCI_IMAGE_LICENSES
 ARG OCI_IMAGE_REF_NAME
 ARG OCI_IMAGE_TITLE
 ARG OCI_IMAGE_DESCRIPTION
-ARG OCI_IMAGE_BASE_DIGEST
 ARG OCI_IMAGE_BASE_NAME
+
+# I'm not sure quite how base digest should work in a multi-platform build
+# environment, so I punted.
+# ARG OCI_IMAGE_BASE_DIGEST
 
 LABEL org.opencontainers.image.created="${OCI_IMAGE_CREATED}"
 LABEL org.opencontainers.image.authors="${OCI_IMAGE_AUTHORS}"
@@ -48,5 +41,5 @@ LABEL org.opencontainers.image.licenses="${OCI_IMAGE_LICENSES}"
 LABEL org.opencontainers.image.ref.name="${OCI_IMAGE_REF_NAME}"
 LABEL org.opencontainers.image.title="${OCI_IMAGE_TITLE}"
 LABEL org.opencontainers.image.description="${OCI_IMAGE_DESCRIPTION}"
-LABEL org.opencontainers.image.base.digest="${OCI_IMAGE_BASE_DIGEST}"
+# LABEL org.opencontainers.image.base.digest="${OCI_IMAGE_BASE_DIGEST}"
 LABEL org.opencontainers.image.base.name="${OCI_IMAGE_BASE_NAME}"
