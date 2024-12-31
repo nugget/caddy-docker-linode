@@ -7,7 +7,10 @@ FROM caddy:latest AS baselayer
 FROM scratch
 COPY --from=baselayer . /
 RUN apk add --no-cache fish ca-certificates libcap mailcap
+
 COPY --from=build build/caddy /usr/bin/caddy
+RUN cp -p /usr/share/caddy/index.html /usr/share/caddy/index-original.html
+COPY webroot/index.html /usr/share/caddy/index.html
 
 EXPOSE 80
 EXPOSE 443
