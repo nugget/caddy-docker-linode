@@ -14,6 +14,7 @@ include ./tools/make/oci-annotations-inherited.Makefile
 OCI_IMAGE_URL="https://hub.docker.com/repository/docker/nugget/caddy-with-linode-dns"
 OCI_IMAGE_SOURCE="https://github.com/nugget/caddy-with-linode-dns"
 OCI_IMAGE_AUTHORS="David 'nugget' McNett <contact@nugget.info>"
+OCI_IMAGE_VENDOR="David 'nugget' McNett <contact@nugget.info>"
 OCI_IMAGE_TITLE="Caddy with dns.providers.linode"
 OCI_IMAGE_DESCRIPTION=$(FROM_IMAGE_DESCRIPTION)"\nThis is a custom build with the dns.providers.linode module and fish shell added to the official distribution."
 OCI_IMAGE_DOCUMENTATION=$(OCI_IMAGE_SOURCE)
@@ -68,7 +69,7 @@ pullbase:
 image: debug pullbase
 	@echo "# making: image"
 	docker context use default
-	docker build $(oci-build-labels) -t $(image):$(devtag) . 
+	docker build $(oci-build-labels) -t $(image):$(devtag) . --load
 	docker inspect $(image):$(devtag) | jq '.[0].Config.Labels' 
 	@echo 
 
