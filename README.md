@@ -8,7 +8,7 @@ changes:
 
 * I am only building for linux/amd64, linux/arm64 currently
 
-* `/usr/bin/caddy` is built with [dns.providers.linode]
+* `/usr/bin/caddy` is built with [pineapplehunter/linode-caddy-dns] (forked from [dns.providers.linode])
 
 * [fish shell] is installed to make forensics more pleasant if
    you find yourself inside the container for any reason
@@ -94,6 +94,7 @@ website.example.com {
 [nugget/caddy-with-linode-dns]: https://hub.docker.com/repository/docker/nugget/caddy-with-linode-dns/general
 [caddy-docker]: https://hub.docker.com/_/caddy
 [dns.providers.linode]: https://github.com/caddy-dns/linode
+[pineapplehunter/linode-caddy-dns]: https://github.com/pineapplehunter/linode-caddy-dns
 [fish shell]: https://fishshell.com
 [Caddy]: https://caddyserver.com
 [secrets top-level element]: https://docs.docker.com/compose/how-tos/use-secrets/

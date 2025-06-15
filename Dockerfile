@@ -1,7 +1,7 @@
 FROM caddy:builder AS builder
 
 RUN xcaddy build \
-	--with github.com/caddy-dns/linode
+	--with github.com/pineapplehunter/linode-caddy-dns@main
 
 FROM caddy:latest AS baselayer
 
