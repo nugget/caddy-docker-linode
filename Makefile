@@ -12,7 +12,7 @@ include ./tools/make/oci-annotations-inherited.Makefile
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
 OCI_IMAGE_URL="https://hub.docker.com/repository/docker/nugget/caddy-with-linode-dns"
-OCI_IMAGE_SOURCE="https://github.com/nugget/caddy-with-linode-dns"
+OCI_IMAGE_SOURCE="https://github.com/nugget/caddy-docker-linode"
 OCI_IMAGE_AUTHORS="David 'nugget' McNett <contact@nugget.info>"
 OCI_IMAGE_VENDOR="David 'nugget' McNett <contact@nugget.info>"
 OCI_IMAGE_TITLE="Caddy with dns.providers.linode"
